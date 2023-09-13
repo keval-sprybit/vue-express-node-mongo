@@ -10,7 +10,8 @@ import axios from 'axios';
 
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5005', // Replace with your API base URL
+    // baseURL: 'http://localhost:5005', // Replace with your API base URL
+    baseURL: 'http://192.168.1.223:5005', // Replace with your API base URL
     // Add other global configurations here
   });
   

@@ -3,7 +3,7 @@
   <div class="min-h-min bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
     <div class="relative py-3 sm:max-w-xl sm:mx-auto">
       <div
-        class="absolute inset-0 bg-gradient-to-r from-lime-300 to-lime-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+        class="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
       </div>
       <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
         <div class="max-w-md mx-auto">
@@ -46,7 +46,6 @@
 <script>
 export default {
   name: 'LoginComponet',
-
   data() {
     return {
       email: '',
@@ -57,6 +56,12 @@ export default {
   methods: {
     async login() {
       try {
+        if (!this.email || !this.password) {
+          console.error('Email and password are required.');
+          // You can show an error message or take appropriate action
+          return; // Exit the function early
+        }
+
         const response = await this.$axios.post('/api/auth/signin', {
           email: this.email,
           password: this.password
@@ -65,30 +70,19 @@ export default {
 
         if (response.status === 200) {
           // Successful login, store the token and redirect to the dashboard
-          // if(responseData.status){
-          //   localStorage.setItem('tokenn', responseData.data.token);
-          //   this.$router.push('/registration');
-          // }else{
+          if (responseData.status) {
+            localStorage.setItem('tokenn', responseData.data.token);
+            this.$showSweetAlert('success', responseData.message);
 
-          // }
-          // this.$swal('Hello Vue world!!!');
-          // this.$swal({
-          //   toast: true,
-          //   position: 'top-end',
-          //   showConfirmButton: false,
-          //   timer: 3000,
-          //   icon: 'error',
-          //   title: 'Hi man',
-          //   text: 'is a good day!',
-          //   didOpen: (toast) => {
-          //     toast.addEventListener('mouseenter', this.$swal.stopTimer)
-          //     toast.addEventListener('mouseleave', this.$swal.resumeTimer)
-          //   }
-          // });
+            setTimeout(() => {
+              this.$router.push('/dashboard');
+            }, 2000);
 
-          this.$showSweetAlert('success', 'It is a good day bae <3!');
+          } else {
+            this.$showSweetAlert('error', responseData.message);
+          }
+
         } else {
-
           console.error('Login failed: Unexpected status code', response.status);
 
         }
