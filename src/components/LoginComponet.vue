@@ -8,7 +8,7 @@
       <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
         <div class="max-w-md mx-auto">
           <div>
-            <h1 class="text-2xl font-semibold">Express + NodeJS + MongoDB+ VueJS</h1>
+            <h1 class="text-2xl font-semibold">Express + NodeJS + MongoDB+ VueJS +Tailwind CSS</h1>
           </div>
           <div class="divide-y divide-gray-200">
             <form @submit.prevent="login">
@@ -44,12 +44,16 @@
 </template>
 
 <script>
+import { useAuthStore } from '../store/store'; 
 export default {
   name: 'LoginComponet',
+  setup() {
+    
+  },
   data() {
     return {
-      email: '',
-      password: '',
+      email: 'keval@admin.com',
+      password: '123456',
       books: []
     };
   },
@@ -61,7 +65,9 @@ export default {
           // You can show an error message or take appropriate action
           return; // Exit the function early
         }
-
+        console.log("login called")
+        
+        const authStoreInstance = useAuthStore();
         const response = await this.$axios.post('/api/auth/signin', {
           email: this.email,
           password: this.password
@@ -71,12 +77,22 @@ export default {
         if (response.status === 200) {
           // Successful login, store the token and redirect to the dashboard
           if (responseData.status) {
-            localStorage.setItem('tokenn', responseData.data.token);
+            // localStorage.setItem('token', responseData.data.token);
             this.$showSweetAlert('success', responseData.message);
+
+            // this.$store.setToken('newToken');
+            // authStoreInstance.setToken('yourAuthToken')
+            // console.log("penia",authStoreInstance.getToken)
+            
+            this.$store.setToken(responseData.data.token);
+           
 
             setTimeout(() => {
               this.$router.push('/dashboard');
             }, 2000);
+
+            // this.$router.push('/dashboard');
+            // router.push('/dashboard');
 
           } else {
             this.$showSweetAlert('error', responseData.message);
