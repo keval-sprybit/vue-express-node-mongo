@@ -106,7 +106,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to, from) => {
   // Perform any logic after the route has changed
-  console.log(`Navigated 🚗 🚲 from ${from.path} to ${to.path}`);
+  console.log(`Navigated 🚗 from ${from.path} to 🚲 ${to.path}`);
 });
 
 export default router
