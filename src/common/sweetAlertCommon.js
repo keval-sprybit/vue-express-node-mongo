@@ -21,4 +21,38 @@ export function showSweetAlert(alertType, message) {
   return swalInstance.fire(swalConfig);
 }
 
+// async confirmDelete(title: string, text: string)
+export function confirmDelete(title, text) {
+  
+      if(title == '')
+      {
+          title = 'Are you sure?';
+      }
+      if(text == '')
+      {
+          text = "You won't be able to revert this!";
+      }
+
+    const promiseData= Swal.fire({
+        title: title,
+        text: text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+          if (result.value)
+          {
+            return true;
+          }
+          else 
+          {
+            return false;
+          }
+      })
+      // return promiseData;
+      return promiseData;
+  }
+
 export default swalInstance;

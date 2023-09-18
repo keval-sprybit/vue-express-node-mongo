@@ -4,7 +4,7 @@ import router from './router'
 import './input.css'
 // import VueSweetalert2 from 'vue-sweetalert2';
 // import 'sweetalert2/dist/sweetalert2.min.css';
-import swalInstance, { showSweetAlert } from './common/sweetAlertCommon'; // Import the SweetAlert service
+import swalInstance, { showSweetAlert,confirmDelete } from './common/sweetAlertCommon'; // Import the SweetAlert service
 import axios from 'axios';
 import { createPinia } from 'pinia';
 import { useAuthStore,authStore } from './store/store.js';
@@ -86,6 +86,7 @@ app.use(router);
 // app.config.globalProperties.$swal = swalInstance;
 
 app.config.globalProperties.$showSweetAlert = showSweetAlert;
+app.config.globalProperties.$confirmDelete = confirmDelete;
 app.config.globalProperties.$axios = axiosInstance;
 app.config.globalProperties.$store = useAuthStore();
 app.mount('#app');

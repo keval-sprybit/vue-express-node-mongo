@@ -86,10 +86,10 @@ export default {
             
             this.$store.setToken(responseData.data.token);
            
-
-            setTimeout(() => {
               this.$router.push('/dashboard');
-            }, 2000);
+            // setTimeout(() => {
+            //   this.$router.push('/dashboard');
+            // }, 2000);
 
             // this.$router.push('/dashboard');
             // router.push('/dashboard');
