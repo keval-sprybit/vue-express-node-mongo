@@ -52,8 +52,8 @@ export default {
   },
   data() {
     return {
-      email: 'keval@admin.com',
-      password: '123456',
+      email: '',
+      password: '',
       books: []
     };
   },

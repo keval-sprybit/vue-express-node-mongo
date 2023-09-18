@@ -21,7 +21,6 @@ export function showSweetAlert(alertType, message) {
   return swalInstance.fire(swalConfig);
 }
 
-// async confirmDelete(title: string, text: string)
 export function confirmDelete(title, text) {
   
       if(title == '')
@@ -51,7 +50,6 @@ export function confirmDelete(title, text) {
             return false;
           }
       })
-      // return promiseData;
       return promiseData;
   }
 
