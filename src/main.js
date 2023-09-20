@@ -3,6 +3,10 @@ import App from './App.vue'
 import router from './router'
 import './input.css'
 import 'vuetify/styles'
+import 'vuetify/dist/vuetify.min.css';
+
+import 'vuetify/lib/styles/main.css';
+import '@mdi/font/css/materialdesignicons.css'
 // import VueSweetalert2 from 'vue-sweetalert2';
 // import 'sweetalert2/dist/sweetalert2.min.css';
 import swalInstance, { showSweetAlert,confirmDelete } from './common/sweetAlertCommon'; // Import the SweetAlert service
@@ -10,13 +14,7 @@ import axios from 'axios';
 import { createPinia } from 'pinia';
 import { useAuthStore,authStore } from './store/store.js';
 
-// import Vuetify from 'vuetify';
-
 import { createVuetify } from 'vuetify'
-
-import 'vuetify/dist/vuetify.min.css';
-
-import 'vuetify/lib/styles/main.css';
 
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'

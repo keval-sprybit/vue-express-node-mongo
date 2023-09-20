@@ -358,15 +358,14 @@ export default {
       try {
         // const isAllSelected = itemsPerPage === -1;
         // // page: isAllSelected ? 'all' : page,            
-        const response = await this.$axios.get('/api/books', {
-          params: {
-            page: page,
-            itemsPerPage: itemsPerPage,
-            sortBy: sortBy[0]?.key, // Sort by the first column only for simplicity
-            sortOrder: sortBy[0]?.order,
-            title: this.name,
-          },
-        });
+        const requestData = {
+          page: page,
+          itemsPerPage: itemsPerPage,
+          sortBy: sortBy[0]?.key,
+          sortOrder: sortBy[0]?.order,
+          title: this.name
+        };
+        const response = await this.$axios.post('/api/books/data-list',requestData);
         const responseData = response.data
 
         if (response.status === 200) {
@@ -389,7 +388,7 @@ export default {
           }
 
         } else {
-          // console.error('Login failed: Unexpected status code', response.status);
+          
           this.$showSweetAlert('error', responseData.message);
         }
 
