@@ -84,8 +84,8 @@
               <span class="text-sm text-gray-600">Lecturer</span>
             </div>
             <span class="h-12 w-12 ml-2 sm:ml-3 mr-2 bg-gray-100 rounded-full overflow-hidden">
-              <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="user profile photo"
-                class="h-full w-full object-cover">
+              <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="user profile photo"
+                class="h-full w-full object-cover ">
             </span>
             <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="hidden sm:block h-6 w-6 text-gray-300">
               <path fill-rule="evenodd"
@@ -136,7 +136,29 @@
           </div>
         </div>
         <!-- <section class="grid md:grid-cols-2 xl:grid-cols-6 gap-6"> -->
-        <section class="grid md:grid-cols-2 xl:grid-cols-1 xl:grid-flow-col ">
+        <section class="grid xl:grid-cols-1 xl:grid-flow-col ">
+          <div class="flex items-center p-8 bg-white shadow rounded-lg">
+            <!-- <v-data-table :headers="headers" :items="serverItems"></v-data-table> -->
+
+            <v-data-table-server v-model:items-per-page="itemsPerPage" :search="search" :headers="headers"
+              :items-length="totalItems" :items="serverItems" :loading="loading" class="elevation-1" item-value="name"
+              @update:options="loadItems">
+
+              <template v-slot:tfoot>
+                <tr>
+                  <td>
+                    <v-text-field v-model="name" hide-details placeholder="Search name..." class="ma-2"
+                      density="compact"></v-text-field>
+                  </td>
+                </tr>
+              </template>
+            </v-data-table-server>
+
+          </div>
+        </section>
+
+        <!--  -->
+        <section class="grid  xl:grid-cols-1 xl:grid-flow-col ">
           <div class="flex items-center p-8 bg-white shadow rounded-lg">
             <!-- component -->
             <!-- This is an example component -->
@@ -168,7 +190,7 @@
                           </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                          <tr v-if="books.length<=0">
+                          <tr v-if="books.length <= 0">
                             <td colspan="4">
                               No data
                             </td>
@@ -203,6 +225,7 @@
 
       </main>
     </div>
+
   </div>
   <div class="modalll">
     <div v-if="showModal"
@@ -260,14 +283,31 @@
       </div>
     </div>
   </div>
+
+  <!-- <DashboadComponet />
+  <WeatherWidget /> -->
 </template>
 
 <script>
+import {
+  VDataTable,
+  VDataTableServer,
+  VDataTableVirtual,
+
+} from "vuetify/labs/VDataTable";
+
+import DashboadComponet from "../components/DashboadComponet.vue";
+import WeatherWidget from "../components/WeatherWidget.vue";
+
 export default {
   name: 'DashboardView',
-  // components: {
-  //     RegistrationComponet
-  // }
+  components: {
+    DashboadComponet,
+    WeatherWidget,
+    VDataTable,
+    VDataTableServer,
+
+  },
   data() {
     return {
       books: [],
@@ -276,19 +316,95 @@ export default {
       book_price: '',
       book_pages: '',
       is_edit: false,
-      current_book: ''
+      current_book: '',
+
+      itemsPerPage: 10,
+      headers: [
+        {
+          title: 'Name',
+          align: 'start',
+          sortable: false,
+          key: 'title',
+        },
+        { title: 'Price', key: 'price', align: 'end' },
+        { title: 'Pages', key: 'pages', align: 'end' },
+        { title: 'action' }
+      ],
+      serverItems: [],
+      loading: true,
+      totalItems: 0,
+      name: '',
+      calories: '',
+      search: '',
     };
+  },
+  async created() {
+    // Load data when the component is created
+    // await this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage });
+  },
+  watch: {
+    name() {
+      this.search = String(Date.now())
+    },
   },
   mounted() {
     // This function will be executed when the component is mounted.
-    this.loadFunction();
+    // this.loadFunction();
+    // this.loadItems();
   },
   methods: {
+    async loadItems({ page, itemsPerPage, sortBy = '' }) {
+      this.loading = true;
+      try {
+        // const isAllSelected = itemsPerPage === -1;
+        // // page: isAllSelected ? 'all' : page,            
+        const response = await this.$axios.get('/api/books', {
+          params: {
+            page: page,
+            itemsPerPage: itemsPerPage,
+            sortBy: sortBy[0]?.key, // Sort by the first column only for simplicity
+            sortOrder: sortBy[0]?.order,
+            title: this.name,
+          },
+        });
+        const responseData = response.data
+
+        if (response.status === 200) {
+
+          if (responseData.status) {
+            this.showModal = false;
+            this.book_name = '';
+            this.book_price = '';
+            this.book_pages = '';
+            this.is_edit = false;
+            this.current_book = '';
+            // this.loadFunction();
+
+            this.serverItems = responseData.data.data;
+            this.totalItems = responseData.data.totalItems;
+            this.loading = false;
+
+          } else {
+            this.$showSweetAlert('error', responseData.message);
+          }
+
+        } else {
+          // console.error('Login failed: Unexpected status code', response.status);
+          this.$showSweetAlert('error', responseData.message);
+        }
+
+
+
+      } catch (error) {
+        console.error('Error loading items:', error);
+        this.loading = false;
+      }
+    },
     async loadFunction() {
       try {
         const response = await this.$axios.get('/api/books');
         const responseData = response.data
-        this.books = responseData.data
+        this.books = responseData.data.data
 
       } catch (error) {
         console.error('Login failed:', error);
@@ -349,7 +465,8 @@ export default {
             this.is_edit = false;
             this.current_book = '';
 
-            this.loadFunction();
+            // this.loadFunction();
+            await this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage });
 
           } else {
             this.$showSweetAlert('error', responseData.message);

@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createPinia } from 'pinia';
 
-import { useAuthStore,authStore } from '../store/store.js'; // Import the Pinia store
+import { useAuthStore, authStore } from '../store/store.js'; // Import the Pinia store
 // import { useAuthStore,authStore } from './store/store.js';
 import NotFound from '../views/NotFound.vue'; // Import your custom 404 component
 
@@ -37,8 +37,8 @@ const routes = [
     },
     meta: { guest: true }
   },
+  { path: '/:catchAll(.*)', redirect: '/404' },
   { path: '/404', component: NotFound },
-  { path: '/:catchAll(.*)', redirect: '/404' }
 ]
 
 const router = createRouter({
@@ -64,7 +64,7 @@ const router = createRouter({
 //   } else {
 //     next();
 //   }
-  
+
 
 // });
 
@@ -86,7 +86,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = useAuthStore().getToken;
-  
+
   if (to.matched.some((record) => record.meta.requireAuth)) {
     if (token) {
       next();
@@ -99,7 +99,7 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
-  }else {
+  } else {
     if (to.matched.length === 0) {
       // Route not found, redirect to 404
       next('/404');
