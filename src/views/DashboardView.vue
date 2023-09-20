@@ -141,9 +141,24 @@
             <!-- <v-data-table :headers="headers" :items="serverItems"></v-data-table> -->
 
             <v-data-table-server v-model:items-per-page="itemsPerPage" :search="search" :headers="headers"
-              :items-length="totalItems" :items="serverItems" :loading="loading" class="elevation-1" item-value="name"
+              :items-length="totalItems" :items="serverItems" :loading="loading" class="elevation-1" item-value="name" :expand-on-click="true"
               @update:options="loadItems">
 
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td class="underline">{{ item.columns.title }}</td>
+                  <td>{{ item.columns.price }}</td>
+                  <td>{{ item.columns.pages }}</td>
+                  <td >
+                    <v-btn :loading="loading" elevation="1" icon color="blue"  @click="edit_book(item.columns)"  position='relative' size="small">
+                      <v-icon dark>mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn :loading="loading" elevation="2" icon color="red"   @click="delete_book(item.columns._id)" position='relative' size="small">
+                      <v-icon >mdi-delete</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </template>
               <template v-slot:tfoot>
                 <tr>
                   <td>
@@ -322,13 +337,12 @@ export default {
       headers: [
         {
           title: 'Name',
-          align: 'start',
           sortable: false,
           key: 'title',
         },
-        { title: 'Price', key: 'price', align: 'end' },
-        { title: 'Pages', key: 'pages', align: 'end' },
-        { title: 'action' }
+        { title: 'Price', key: 'price' },
+        { title: 'Pages', key: 'pages' },
+        { title: 'Action',key: '_id',sortable: false, }
       ],
       serverItems: [],
       loading: true,
@@ -365,7 +379,7 @@ export default {
           sortOrder: sortBy[0]?.order,
           title: this.name
         };
-        const response = await this.$axios.post('/api/books/data-list',requestData);
+        const response = await this.$axios.post('/api/books/data-list', requestData);
         const responseData = response.data
 
         if (response.status === 200) {
@@ -388,7 +402,7 @@ export default {
           }
 
         } else {
-          
+
           this.$showSweetAlert('error', responseData.message);
         }
 
@@ -515,7 +529,8 @@ export default {
             this.is_edit = false;
             this.current_book = '';
 
-            this.loadFunction();
+            // this.loadFunction();
+            await this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage });
           } else {
             this.$showSweetAlert('error', responseData.message);
           }
@@ -552,7 +567,8 @@ export default {
 
             this.$showSweetAlert('success', responseData.message);
 
-            this.loadFunction();
+            // this.loadFunction();
+            await this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage });
           } else {
             this.$showSweetAlert('error', responseData.message);
           }
