@@ -10,9 +10,9 @@
         </div>
         <div class="flex justify-center">
           <div class="text-center p-2">
-              <div class="text-lg text-grey-light">
+              <div class="text-lg text-blue-500">
                   <span class="text-right">45˚F</span>
-                  <span class="text-center text-5xl text-white mx-6  font-thin">49˚F</span>
+                  <span class="text-center text-5xl text-black mx-6  font-thin">49˚F</span>
                   <span class="text-left">58˚F</span>
                 </div>
               <div class="text-grey-light tracking-wide">

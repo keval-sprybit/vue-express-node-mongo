@@ -17,6 +17,12 @@ const routes = [
     meta: { guest: true }
   },
   {
+    path: '/login',
+    name: 'login',
+    component: HomeView,
+    meta: { guest: true }
+  },
+  {
     path: '/registration',
     name: 'registration',
     component: RegistationView,
@@ -82,6 +88,19 @@ const router = createRouter({
 //     next();
 //   }
 
+// });
+
+
+// authStore.$subscribe((mutation, state) => {
+//   if (mutation.type === 'token') { // Check if the token was mutated
+//     console.log('Token changed! New value:', state.token);
+//     // Perform any actions based on the token change, e.g.,
+//     if (state.token) {
+//       router.push('/dashboard'); // Redirect to a protected route
+//     } else {
+//       authStore.clearUserDetails(); // Clear user data if token is cleared
+//     }
+//   }
 // });
 
 router.beforeEach((to, from, next) => {

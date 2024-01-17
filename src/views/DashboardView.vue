@@ -141,20 +141,22 @@
             <!-- <v-data-table :headers="headers" :items="serverItems"></v-data-table> -->
 
             <v-data-table-server v-model:items-per-page="itemsPerPage" :search="search" :headers="headers"
-              :items-length="totalItems" :items="serverItems" :loading="loading" class="elevation-1" item-value="name" :expand-on-click="true"
-              @update:options="loadItems">
+              :items-length="totalItems" :items="serverItems" :loading="loading" class="elevation-1" item-value="name"
+              :expand-on-click="true" @update:options="loadItems">
 
               <template v-slot:item="{ item }">
                 <tr>
                   <td class="underline">{{ item.columns.title }}</td>
                   <td>{{ item.columns.price }}</td>
                   <td>{{ item.columns.pages }}</td>
-                  <td >
-                    <v-btn :loading="loading" elevation="1" icon color="blue"  @click="edit_book(item.columns)"  position='relative' size="small">
+                  <td>
+                    <v-btn :loading="loading" elevation="1" icon color="blue" @click="edit_book(item.columns)"
+                      position='relative' size="small">
                       <v-icon dark>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn :loading="loading" elevation="2" icon color="red"   @click="delete_book(item.columns._id)" position='relative' size="small">
-                      <v-icon >mdi-delete</v-icon>
+                    <v-btn :loading="loading" elevation="2" icon color="red" @click="delete_book(item.columns._id)"
+                      position='relative' size="small">
+                      <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </td>
                 </tr>
@@ -172,6 +174,11 @@
           </div>
         </section>
 
+        <section class="grid  xl:grid-cols-1 xl:grid-flow-col ">
+          <div class="flex items-center p-8 bg-white shadow rounded-lg">
+            <WeatherWidget />
+          </div>
+        </section>
         <!--  -->
         <section class="grid  xl:grid-cols-1 xl:grid-flow-col ">
           <div class="flex items-center p-8 bg-white shadow rounded-lg">
@@ -205,15 +212,14 @@
                           </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                          <tr v-if="books.length <= 0">
+                          <tr v-if="books?.length <= 0">
                             <td colspan="4">
                               No data
                             </td>
                           </tr>
                           <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" v-else v-for="book in books">
-
                             <td class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                              {{ book.title }}</td>
+                              {{ book['title'] }}</td>
                             <td class="py-4 px-6 text-sm font-medium text-gray-500 whitespace-nowrap dark:text-white">
                               ${{ book.price }}</td>
                             <td class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -260,7 +266,7 @@
               </svg>
             </div>
           </div>
-          <form class="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8">
+          <form class="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8" enctype="multipart/form-data">
 
             <div>
               <label for="book_name" class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Book
@@ -283,6 +289,11 @@
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 required="" v-model="book_pages">
             </div>
+            <div>
+              <label for="book_image" class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Book
+                Image</label>
+              <input type="file" name="book_image" id="book_image" accept="image/*" @change="handleImageChange">
+            </div>
 
 
             <div class="flex justify-end pt-2">
@@ -299,8 +310,7 @@
     </div>
   </div>
 
-  <!-- <DashboadComponet />
-  <WeatherWidget /> -->
+  <!-- <DashboadComponet /> -->
 </template>
 
 <script>
@@ -313,6 +323,8 @@ import {
 
 import DashboadComponet from "../components/DashboadComponet.vue";
 import WeatherWidget from "../components/WeatherWidget.vue";
+import axiosInstance from '../axiosConfig'; // Import the configured Axios instance
+import { useAuthStore } from '../store/store';
 
 export default {
   name: 'DashboardView',
@@ -329,26 +341,22 @@ export default {
       showModal: false,
       book_name: '',
       book_price: '',
+      book_image: null,
       book_pages: '',
       is_edit: false,
       current_book: '',
 
       itemsPerPage: 10,
       headers: [
-        {
-          title: 'Name',
-          sortable: false,
-          key: 'title',
-        },
+        { title: 'Name', sortable: true, key: 'title', },
         { title: 'Price', key: 'price' },
         { title: 'Pages', key: 'pages' },
-        { title: 'Action',key: '_id',sortable: false, }
+        { title: 'Action', key: '_id', sortable: false, }
       ],
       serverItems: [],
       loading: true,
       totalItems: 0,
       name: '',
-      calories: '',
       search: '',
     };
   },
@@ -379,8 +387,12 @@ export default {
           sortOrder: sortBy[0]?.order,
           title: this.name
         };
-        const response = await this.$axios.post('/api/books/data-list', requestData);
+
+        const response = await axiosInstance.post('/api/books/data-list', requestData);
         const responseData = response.data
+        this.books = responseData.data.data
+
+        console.log("datatable API ")
 
         if (response.status === 200) {
 
@@ -407,11 +419,20 @@ export default {
         }
 
 
-
       } catch (error) {
         console.error('Error loading items:', error);
         this.loading = false;
       }
+    },
+    async handleImageChange(event) {
+      const file = event.target.files[0];
+      console.log("image changed", file)
+      this.book_image = file;
+
+      const formData = new FormData();
+      formData.append('book_image', file);
+      const response = await axiosInstance.post('/api/image/image-upload', formData);
+      console.log("img res",response)      
     },
     async loadFunction() {
       try {
@@ -427,7 +448,7 @@ export default {
     logoutButtonClick() {
       try {
         console.log("-------Logout--------- 🙂💔");
-        this.$store.clearToken();
+        useAuthStore().clearToken();
         this.$router.push('/');
 
       } catch (error) {
@@ -444,7 +465,6 @@ export default {
       this.book_name = '';
       this.book_price = '';
       this.book_pages = '';
-
       this.current_book = '';
     },
     async add_book() {
@@ -507,7 +527,6 @@ export default {
       try {
         if (!this.book_name || !this.book_price || !this.book_pages) {
           console.error('Books have some required.');
-          // You can show an error message or take appropriate action
           return; // Exit the function early
         }
 
@@ -516,6 +535,7 @@ export default {
           price: this.book_price,
           pages: this.book_pages
         });
+
         const responseData = response.data
 
         if (response.status === 200) {
